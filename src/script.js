@@ -367,6 +367,13 @@ function loadGraphic() {
     reader.readAsText(data)
 }
 
+function changeColor() {
+    color[0] = Number(redValue.value)
+    color[1] = Number(greenValue.value)
+    color[2] = Number(blueValue.value)
+    color[3] = Number(alphaValue.value)
+}
+
 btnLine.addEventListener("click", drawLine)
 btnSquare.addEventListener("click", drawSquare)
 btnRectangle.addEventListener("click", drawRectangle)
@@ -374,5 +381,9 @@ btnPolygon.addEventListener("click", drawPolygon)
 btnStopPolygonDraw.addEventListener("click", stopPolygonDraw)
 btnSave.addEventListener("click", saveGraphic)
 fileInput.addEventListener("change", loadGraphic)
+redValue.addEventListener("change", changeColor)
+greenValue.addEventListener("change", changeColor)
+blueValue.addEventListener("change", changeColor)
+alphaValue.addEventListener("change", changeColor)
 
 window.onload = main

@@ -41,6 +41,11 @@ main {
     margin: 5px;
 }
 
+.color-container {
+    width: 100%;
+    font-weight: bold;
+}
+
 .selection-container,
 .save-container,
 .help-container,
