@@ -367,11 +367,20 @@ function loadGraphic() {
     reader.readAsText(data)
 }
 
+function hexToRGB(hex) {
+    const R = parseInt(hex.slice(1, 3), 16);
+    const G = parseInt(hex.slice(3, 5), 16);
+    const B = parseInt(hex.slice(5, 7), 16);
+    return [R, G, B];
+}
+
 function changeColor() {
-    color[0] = Number(redValue.value)
-    color[1] = Number(greenValue.value)
-    color[2] = Number(blueValue.value)
-    color[3] = Number(alphaValue.value)
+    var hexColor = btnColor.value;
+    RGBColor = hexToRGB(hexColor);
+    color[0] = RGBColor[0]/255 //R
+    color[1] = RGBColor[1]/255 //G
+    color[2] = RGBColor[2]/255 //B
+    color[3] = 1.0             //A
 }
 
 btnLine.addEventListener("click", drawLine)
@@ -381,9 +390,6 @@ btnPolygon.addEventListener("click", drawPolygon)
 btnStopPolygonDraw.addEventListener("click", stopPolygonDraw)
 btnSave.addEventListener("click", saveGraphic)
 fileInput.addEventListener("change", loadGraphic)
-redValue.addEventListener("change", changeColor)
-greenValue.addEventListener("change", changeColor)
-blueValue.addEventListener("change", changeColor)
-alphaValue.addEventListener("change", changeColor)
+btnColor.addEventListener("change", changeColor)
 
 window.onload = main
