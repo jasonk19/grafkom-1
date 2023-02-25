@@ -327,6 +327,10 @@ function saveGraphic() {
         rectangle: {
             vertices: rectangle.getVertices(),
             colors: rectangle.getColors()
+        },
+        polygon: {
+            vertices: polygon.getVertices(),
+            colors: polygon.getColors()
         }
     }
     const dataText = JSON.stringify(data)
@@ -357,6 +361,8 @@ function loadGraphic() {
         square.setColors(graphics.square.colors)
         rectangle.setVertices(graphics.rectangle.vertices)
         rectangle.setColors(graphics.rectangle.colors)
+        polygon.setVertices(graphics.polygon.vertices)
+        polygon.setColors(graphics.polygon.colors)
     }
     reader.readAsText(data)
 }
