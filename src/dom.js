@@ -1,0 +1,5 @@
+const modeText = document.getElementById("mode")
+const btnLine = document.getElementById("btnLine")
+const btnSquare = document.getElementById("btnSquare")
+const btnRectangle = document.getElementById("btnRectangle")
+const btnPolygon = document.getElementById("btnPolygon")

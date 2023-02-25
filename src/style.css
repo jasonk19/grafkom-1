@@ -1,0 +1,64 @@
+* {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+    padding: 0;
+    margin: 0;
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.canvas-section {
+    margin: 10px;
+    border: 1px solid black;
+}
+
+.tools-section {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.tools-container {
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin: 5px;
+}
+
+.selection-container,
+.save-container,
+.help-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+}
+
+button {
+    outline: none;
+    border: none;
+    padding: 5px 15px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+button:focus {
+    background-color: darkgrey;
+}

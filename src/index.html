@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <title>2D Web Based CAD</title>
+</head>
+
+<body>
+    <main>
+        <h2>2D Web Based CAD</h2>
+        <p>Mode: <span id="mode"></span></p>
+        <section class="canvas-section">
+            <canvas id="canvas" width="700" height="450"></canvas>
+        </section>
+        <section class="tools-section">
+            <h4>Tools</h4>
+            <section class="tools-container">
+                <div>
+                    <button id="btnLine">Line</button>
+                    <button id="btnSquare">Square</button>
+                    <button id="btnRectangle">Rectangle</button>
+                    <button id="btnPolygon">Polygon</button>
+                </div>
+                <div class="selection-container">
+                    <p>Selection Tool</p>
+                    <button>Select</button>
+                </div>
+                <div class="save-container">
+                    <p>Save Graphics?</p>
+                    <button>Save</button>
+                </div>
+                <div class="help-container">
+                    <p>Need Help?</p>
+                    <button>Help</button>
+                </div>
+            </section>
+        </section>
+    </main>
+
+
+    <!-- SCRIPTS -->
+    <script src="./dom.js"></script>
+    <script src="./glUtils.js"></script>
+    <script src="./shape.js"></script>
+    <script src="./line.js"></script>
+    <script src="./square.js"></script>
+    <script src="./rectangle.js"></script>
+    <script src="./script.js"></script>
+
+</body>
+
+</html>
