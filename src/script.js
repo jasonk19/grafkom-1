@@ -163,6 +163,9 @@ function handleSquareDrag(e) {
     } else if (square_dragging) {
         const x0 = square.getTempSquareVertice(square.getTempSquareVerticesLength() - 8)
         const y0 = square.getTempSquareVertice(square.getTempSquareVerticesLength() - 7)
+        let distance = Math.abs(x - x0) > Math.abs(y - y0) ? Math.abs(x - x0) : Math.abs(y - y0)
+        x = x0 > x ? x0 - distance : x0 + distance
+        y = y0 > y ? y0 - distance : y0 + distance
         square.setTempSquareVertice(square.getTempSquareVerticesLength() - 6, x0)
         square.setTempSquareVertice(square.getTempSquareVerticesLength() - 5, y)
         square.setTempSquareVertice(square.getTempSquareVerticesLength() - 4, x)
