@@ -383,6 +383,88 @@ function changeColor() {
     color[3] = 1.0             //A
 }
 
+function dist(x1, y1, x2, y2) {
+    // euclidean distance
+    return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+}
+
+function handleColorVerticeClick(e) {
+    const rect = canvas.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    x = x / canvas.width * 2 - 1
+    y = 1 - y / canvas.height * 2
+
+    let distance = 0.1
+
+    // Find the closest vertice to the lines
+    for (let i = 0 ; i < line.getVerticesLength() ; i+=2) {
+        let lineIdx = i / 2
+        if (dist(x, y, line.getVertice(i), line.getVertice(i+1)) <= distance) {
+            colorIdxStart = lineIdx * 4
+            line.setColor(colorIdxStart, color[0])      //R
+            line.setColor(colorIdxStart+1, color[1])    //G
+            line.setColor(colorIdxStart+2, color[2])    //B
+            line.setColor(colorIdxStart+3, color[3])    //A
+        }
+    }
+
+    // Find the closest vertice to the squares
+    for (let i = 0 ; i < square.getVerticesLength() ; i++) {
+        squareVertices = square.getVertice(i)
+        squareColor = square.getColor(i)
+        for (let j = 0 ; j < squareVertices.length ; j+=2) {
+            colorIdxStart = j/2 * 4
+            if (dist(x, y, squareVertices[j], squareVertices[j+1]) <= distance) {
+                squareColor[colorIdxStart] = color[0]
+                squareColor[colorIdxStart+1] = color[1]
+                squareColor[colorIdxStart+2] = color[2]
+                squareColor[colorIdxStart+3] = color[3]
+                square.setColor(i, squareColor)
+            }
+        }
+    }
+
+    // Find the closest vertice to the rectangles
+    for (let i = 0 ; i < rectangle.getVerticesLength() ; i++) {
+        rectangleVertices = rectangle.getVertice(i)
+        rectangleColor = rectangle.getColor(i)
+        for (let j = 0 ; j < rectangleVertices.length ; j+=2) {
+            colorIdxStart = j/2 * 4
+            if (dist(x, y, rectangleVertices[j], rectangleVertices[j+1]) <= distance) {
+                rectangleColor[colorIdxStart] = color[0]
+                rectangleColor[colorIdxStart+1] = color[1]
+                rectangleColor[colorIdxStart+2] = color[2]
+                rectangleColor[colorIdxStart+3] = color[3]
+                rectangle.setColor(i, rectangleColor)
+            }
+        }
+    }
+
+    // Find the closest vertice to the polygons
+    for (let i = 0 ; i < polygon.getVerticesLength() ; i++) {
+        polygonVertices = polygon.getVertice(i)
+        polygonColor = polygon.getColor(i)
+        for (let j = 0 ; j < polygonVertices.length ; j+=2) {
+            colorIdxStart = j/2 * 4
+            if (dist(x, y, polygonVertices[j], polygonVertices[j+1]) <= distance) {
+                polygonColor[colorIdxStart] = color[0]
+                polygonColor[colorIdxStart+1] = color[1]
+                polygonColor[colorIdxStart+2] = color[2]
+                polygonColor[colorIdxStart+3] = color[3]
+                polygon.setColor(i, polygonColor)
+            }
+        }
+    }
+
+}
+
+function colorOneVertice() {
+    modeText.innerText = "Color Vertice";
+    canvas.onmousedown = function (e) { handleColorVerticeClick(e) }
+}
+
 btnLine.addEventListener("click", drawLine)
 btnSquare.addEventListener("click", drawSquare)
 btnRectangle.addEventListener("click", drawRectangle)
@@ -391,5 +473,6 @@ btnStopPolygonDraw.addEventListener("click", stopPolygonDraw)
 btnSave.addEventListener("click", saveGraphic)
 fileInput.addEventListener("change", loadGraphic)
 btnColor.addEventListener("change", changeColor)
+colorVertice.addEventListener("click", colorOneVertice)
 
 window.onload = main
