@@ -60,6 +60,14 @@ class Shape {
         this.colors[pos] = color
     }
 
+    setVertices(items) {
+        this.vertices = items
+    }
+
+    setColors(items) {
+        this.colors = items
+    }
+
     getVerticesLength() {
         return this.vertices.length
     }

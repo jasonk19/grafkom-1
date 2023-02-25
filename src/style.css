@@ -33,7 +33,7 @@ main {
 }
 
 .tools-container {
-    width: fit-content;
+    width: 50%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -43,7 +43,8 @@ main {
 
 .selection-container,
 .save-container,
-.help-container {
+.help-container,
+.load-container {
     width: 100%;
     display: flex;
     justify-content: space-between;

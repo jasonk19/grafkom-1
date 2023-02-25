@@ -250,9 +250,59 @@ function drawPolygon() {
     canvas.onmousemove = function (e) { console.log(e.clientX) }
 }
 
+function saveGraphic() {
+    let element = document.createElement("a")
+    const data = {
+        line: {
+            vertices: line.getVertices(),
+            colors: line.getColors()
+        },
+        square: {
+            vertices: square.getVertices(),
+            colors: square.getColors()
+        },
+        rectangle: {
+            vertices: rectangle.getVertices(),
+            colors: rectangle.getColors()
+        }
+    }
+    const dataText = JSON.stringify(data)
+    element.setAttribute("href", "data:text/json, " + encodeURIComponent(dataText))
+    element.setAttribute("download", "graphic.json")
+
+    document.body.appendChild(element)
+    element.click()
+    document.body.removeChild(element)
+}
+
+function loadGraphic() {
+    const data = fileInput.files[0]
+
+    if (!data) {
+        alert("Input file failed!")
+        return;
+    }
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+        const graphics = JSON.parse(e.target.result)
+
+        if (!graphics) return;
+        line.setVertices(graphics.line.vertices)
+        line.setColors(graphics.line.colors)
+        square.setVertices(graphics.square.vertices)
+        square.setColors(graphics.square.colors)
+        rectangle.setVertices(graphics.rectangle.vertices)
+        rectangle.setColors(graphics.rectangle.colors)
+    }
+    reader.readAsText(data)
+}
+
 btnLine.addEventListener("click", drawLine)
 btnSquare.addEventListener("click", drawSquare)
 btnRectangle.addEventListener("click", drawRectangle)
 btnPolygon.addEventListener("click", drawPolygon)
+btnSave.addEventListener("click", saveGraphic)
+fileInput.addEventListener("change", loadGraphic)
 
 window.onload = main
