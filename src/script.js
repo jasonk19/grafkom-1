@@ -3,6 +3,7 @@ const gl = canvas.getContext("webgl")
 const line = new Line()
 const square = new Square()
 const rectangle = new Rectangle()
+const polygon = new Polygon()
 
 // UTILS
 const color = [0, 0, 0, 1]
@@ -10,6 +11,7 @@ let count = -1
 let line_dragging = false
 let square_dragging = false
 let rectangle_dragging = false
+let polygon_dragging = false
 
 // MAIN PROGRAM
 function main() {
@@ -80,6 +82,20 @@ function main() {
         // TEMPORARY RECTANGLE
         setBuffer(rectangle.getTempRectangleVertices(), rectangle.getTempRectangleColors());
         count = Math.floor(rectangle.getTempRectangleVerticesLength() / 2);
+        gl.drawArrays(gl.TRIANGLE_FAN, 0, count);
+
+        // POLYGON
+        for (let i = 0; i < polygon.getVerticesLength(); i++) {
+            let vert = polygon.getVertice(i)
+            let color = polygon.getColor(i)
+            setBuffer(vert, color)
+            count = Math.floor(vert.length / 2)
+            gl.drawArrays(gl.TRIANGLE_FAN, 0, count)
+        }
+
+        // TEMPORARY POLYGON
+        setBuffer(polygon.getTempPolygonVertices(), polygon.getTempPolygonColors());
+        count = Math.floor(polygon.getTempPolygonVerticesLength() / 2);
         gl.drawArrays(gl.TRIANGLE_FAN, 0, count);
 
         window.requestAnimationFrame(draw)
@@ -226,6 +242,53 @@ function handleRectangleDrag(e) {
     }
 }
 
+// Polygon
+function handlePolygonClick(e) {
+    const rect = canvas.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    x = x / canvas.width * 2 - 1
+    y = 1 - y / canvas.height * 2
+
+    polygon.addManyTempPolygonVertices(x, y)
+    polygon.addManyTempPolygonColorsFromArray(color)
+
+    if (polygon.getTempPolygonVerticesLength() > 8) {
+        btnStopPolygonDraw.removeAttribute("disabled")
+    }
+}
+
+function handlePolygonDrag(e) {
+    const rect = canvas.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    x = x / canvas.width * 2 - 1
+    y = 1 - y / canvas.height * 2
+
+    if (polygon.getTempPolygonVerticesLength() == 2 && !polygon_dragging) {
+        polygon_dragging = true
+        polygon.addManyTempPolygonVertices(x, y)
+        polygon.addManyTempPolygonColorsFromArray(color)
+    } else if (polygon_dragging) {
+        polygon.setTempPolygonVertice(polygon.getTempPolygonVerticesLength() - 2, x)
+        polygon.setTempPolygonVertice(polygon.getTempPolygonVerticesLength() - 1, y)
+    }
+}
+
+function stopPolygonDraw() {
+    polygon_dragging = false
+    polygon.removeTempPolygonVertice()
+    polygon.removeTempPolygonColors()
+
+    polygon.addVertice(polygon.temp_polygon_vertices)
+    polygon.addColor(polygon.temp_polygon_colors)
+
+    polygon.clearTempPolygonVertices()
+    polygon.clearTempPolygonColors()
+}
+
 function drawLine() {
     modeText.innerText = "Line tool";
     canvas.onmousedown = function (e) { handleLineClick(e) };
@@ -246,8 +309,8 @@ function drawRectangle() {
 
 function drawPolygon() {
     modeText.innerText = "Polygon tool";
-    canvas.onmousedown = function (e) { console.log(e.clientX) }
-    canvas.onmousemove = function (e) { console.log(e.clientX) }
+    canvas.onmousedown = function (e) { handlePolygonClick(e) }
+    canvas.onmousemove = function (e) { handlePolygonDrag(e) }
 }
 
 function saveGraphic() {
@@ -302,6 +365,7 @@ btnLine.addEventListener("click", drawLine)
 btnSquare.addEventListener("click", drawSquare)
 btnRectangle.addEventListener("click", drawRectangle)
 btnPolygon.addEventListener("click", drawPolygon)
+btnStopPolygonDraw.addEventListener("click", stopPolygonDraw)
 btnSave.addEventListener("click", saveGraphic)
 fileInput.addEventListener("change", loadGraphic)
 
