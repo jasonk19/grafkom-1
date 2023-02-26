@@ -9,31 +9,41 @@ class Scaler {
     }
 
     scale(final_x, final_y) {
-        let dx = final_x - this.initial_X
-        let dy = final_y - this.initial_Y
+        this.shape_collector.getVertice(this.index)[this.point_index] = final_x
+        this.shape_collector.getVertice(this.index)[this.point_index+1] = final_y
+        let dx = Math.abs(final_x - this.initial_X)
+        let dy = Math.abs(final_y - this.initial_Y)
 
         this.initial_X = final_x
         this.initial_Y = final_y
 
-        console.log("dx: " + dx)
-        console.log("dy: " + dy)
-
-        // update x
-        for (let i = 0; i < this.shape_collector.getVertice(this.index).length; i += 2) {
-            if (this.shape_collector.getVertice(this.index)[i] >= this.shape_collector.getVertice(this.index)[this.point_index]) {
-                this.shape_collector.getVertice(this.index)[i] += dx
-            } else {
-                this.shape_collector.getVertice(this.index)[i] -= dx
-            }
+        let opposite_vertice = -1
+        if (this.point_index == 0) {
+            opposite_vertice = 4
+        } 
+        else if (this.point_index == 2) {
+            opposite_vertice = 6
+        }
+        else if (this.point_index == 4) {
+            opposite_vertice = 0
+        }
+        else if (this.point_index == 6) {
+            opposite_vertice = 2
         }
 
-        // update y
-        for (let i = 0; i < this.shape_collector.getVertice(this.index).length; i += 2) {
-            // update below
-            if (this.shape_collector.getVertice(this.index)[i] < this.shape_collector.getVertice(this.index)[this.point_index]) {
-                this.shape_collector.getVertice(this.index)[i] -= dx
-            } else {
-                this.shape_collector.getVertice(this.index)[i] += dx
+        var firstIter = true;
+        for (let i = 0; i < 8; i += 2) {
+            if (i != this.point_index && i != opposite_vertice) {
+                if (firstIter) {
+                    this.shape_collector.getVertice(this.index)[i] = this.shape_collector.getVertice(this.index)[opposite_vertice];
+                    this.shape_collector.getVertice(this.index)[i + 1] = final_y
+                    firstIter = false;
+                }
+                else {
+                    this.shape_collector.getVertice(this.index)[i] = final_x;
+                    this.shape_collector.getVertice(this.index)[i+1] = this.shape_collector.getVertice(this.index)[opposite_vertice + 1]
+                }
+
             }
         }
     }

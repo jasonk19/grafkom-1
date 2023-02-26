@@ -20,7 +20,17 @@ const shape_selector = new ShapeSelector()
 let active_rotator = null
 let move_dragging = false
 let active_mover = null
+
+// Resizer variables
 let active_scaler = null
+let active_resizing = false
+let type_selected = null
+let idx_vertices = null //i
+let idx_vertice = null //j
+let init_X = null
+let init_Y = null
+
+let dist_radius = 0.05
 
 
 // SELECT
@@ -474,6 +484,121 @@ function handleSelectClick(e) {
         })
         shape_selector.addColor(selected_color)
     }
+
+    if (!active_resizing) {
+        // detect edge
+        found = false
+        // Find the closest vertice to the lines
+        for (let i = 0; i < line.getVerticesLength(); i += 2) {
+            let lineIdx = i / 2
+            if (dist(x, y, line.getVertice(i), line.getVertice(i + 1)) <= dist_radius && !found) {
+                colorIdxStart = lineIdx * 4
+                line.setColor(colorIdxStart, color[0])      //R
+                line.setColor(colorIdxStart + 1, color[1])    //G
+                line.setColor(colorIdxStart + 2, color[2])    //B
+                line.setColor(colorIdxStart + 3, color[3])    //A
+                found = true
+                type_selected = "line"
+                idx_vertices = i
+                idx_vertice = null
+            }
+        }
+
+        // Find the closest vertice to the squares
+        for (let i = 0; i < square.getVerticesLength(); i++) {
+            squareVertices = square.getVertice(i)
+            squareColor = square.getColor(i)
+            for (let j = 0; j < squareVertices.length; j += 2) {
+                colorIdxStart = j / 2 * 4
+                if (dist(x, y, squareVertices[j], squareVertices[j + 1]) <= dist_radius && !found) {
+                    squareColor[colorIdxStart] = color[0]
+                    squareColor[colorIdxStart + 1] = color[1]
+                    squareColor[colorIdxStart + 2] = color[2]
+                    squareColor[colorIdxStart + 3] = color[3]
+                    square.setColor(i, squareColor)
+                    found = true
+                    type_selected = "square"
+                    idx_vertices = i
+                    idx_vertice = j
+                }
+            }
+        }
+
+        // Find the closest vertice to the rectangles
+        for (let i = 0; i < rectangle.getVerticesLength(); i++) {
+            rectangleVertices = rectangle.getVertice(i)
+            rectangleColor = rectangle.getColor(i)
+            for (let j = 0; j < rectangleVertices.length; j += 2) {
+                colorIdxStart = j / 2 * 4
+                if (dist(x, y, rectangleVertices[j], rectangleVertices[j + 1]) <= dist_radius && !found) {
+                    rectangleColor[colorIdxStart] = color[0]
+                    rectangleColor[colorIdxStart + 1] = color[1]
+                    rectangleColor[colorIdxStart + 2] = color[2]
+                    rectangleColor[colorIdxStart + 3] = color[3]
+                    rectangle.setColor(i, rectangleColor)
+                    found = true
+                    type_selected = "rectangle"
+                    idx_vertices = i
+                    idx_vertice = j
+                }
+            }
+        }
+
+        // Find the closest vertice to the polygons
+        for (let i = 0; i < polygon.getVerticesLength(); i++) {
+            polygonVertices = polygon.getVertice(i)
+            polygonColor = polygon.getColor(i)
+            for (let j = 0; j < polygonVertices.length; j += 2) {
+                colorIdxStart = j / 2 * 4
+                if (dist(x, y, polygonVertices[j], polygonVertices[j + 1]) <= dist_radius && !found) {
+                    polygonColor[colorIdxStart] = color[0]
+                    polygonColor[colorIdxStart + 1] = color[1]
+                    polygonColor[colorIdxStart + 2] = color[2]
+                    polygonColor[colorIdxStart + 3] = color[3]
+                    polygon.setColor(i, polygonColor)
+                    found = true
+                    type_selected = "polygon"
+                    idx_vertices = i
+                    idx_vertice = j
+                }
+            }
+        }
+        if (found) {
+            active_resizing = true
+            console.log("here")
+            if (type_selected === "line") {
+                init_X = line.vertices[idx_vertices]
+                init_Y = line.vertices[idx_vertices + 1]
+                active_scaler = new Scaler(line.vertices[idx_vertices], line.vertices[idx_vertices+1], shape_selector, 0, idx_vertices)
+            }
+            else if (type_selected === "square") {
+                init_X = square.vertices[idx_vertices][idx_vertice]
+                init_Y = square.vertices[idx_vertices][idx_vertice+1]
+                active_scaler = new Scaler(square.vertices[idx_vertices][idx_vertice], square.vertices[idx_vertices][idx_vertice+1], shape_selector, 0, idx_vertice)
+            }
+            else if (type_selected === "rectangle") {
+                init_X = rectangle.vertices[idx_vertices][idx_vertice]
+                init_Y = rectangle.vertices[idx_vertices][idx_vertice+1]
+                active_scaler = new Scaler(rectangle.vertices[idx_vertices][idx_vertice], rectangle.vertices[idx_vertices][idx_vertice+1], shape_selector, 0, idx_vertice)
+            }
+            else if (type_selected === "polygon") {
+                init_X = polygon.vertices[idx_vertices][idx_vertice]
+                init_Y = polygon.vertices[idx_vertices][idx_vertice+1]
+                active_scaler = new Scaler(polygon.vertices[idx_vertices][idx_vertice], polygon.vertices[idx_vertices][idx_vertice+1], shape_selector, 0, idx_vertice)
+            }
+            console.log(init_X, init_Y)
+            
+        }
+    }
+    else {
+        active_resizing = false
+        type_selected = null
+        idx_vertices = null
+        idx_vertice = null
+        active_scaler = null
+        init_X = null
+        init_Y = null
+    }
 }
 
 function handleChangeScaleFactor(e) {
@@ -487,11 +612,41 @@ function handleChangeScaleFactor(e) {
     }
 }
 
+function handleResize(e) {
+    const rect = canvas.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    x = x / canvas.width * 2 - 1
+    y = 1 - y / canvas.height * 2
+    
+    if (active_resizing) {
+        if (type_selected === "line") {
+            line.vertices[idx_vertices] = x
+            line.vertices[idx_vertices+1] = y
+            // active_scaler.scale(x,y)
+        } else if (type_selected === "square") {
+
+            active_scaler.scale(x,y)
+        } else if (type_selected === "rectangle") {
+            active_scaler.scale(x,y)
+        } else if (type_selected === "polygon") {
+            polygon.vertices[idx_vertices][idx_vertice] = x
+            polygon.vertices[idx_vertices][idx_vertice+1] = y
+            // active_scaler.scale(x,y)
+        }
+    }
+}
+
 function doSelect() {
     modeText.innerText = "Select tool";
     transformationTool.style.display = "flex"
     canvas.onmousedown = function (e) {
         handleSelectClick(e)
+    }
+
+    canvas.onmousemove = function(e) {
+        handleResize(e)
     }
     inputRotationDegree.onchange = function (e) {
         handleChangeRotation(e)
@@ -606,7 +761,7 @@ function changeColor() {
 }
 
 function dist(x1, y1, x2, y2) {
-    // euclidean distance
+    // euclidean dist
     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
 
@@ -618,12 +773,10 @@ function handleColorVerticeClick(e) {
     x = x / canvas.width * 2 - 1
     y = 1 - y / canvas.height * 2
 
-    let distance = 0.05
-
     // Find the closest vertice to the lines
     for (let i = 0; i < line.getVerticesLength(); i += 2) {
         let lineIdx = i / 2
-        if (dist(x, y, line.getVertice(i), line.getVertice(i + 1)) <= distance) {
+        if (dist(x, y, line.getVertice(i), line.getVertice(i + 1)) <= dist_radius) {
             colorIdxStart = lineIdx * 4
             line.setColor(colorIdxStart, color[0])      //R
             line.setColor(colorIdxStart + 1, color[1])    //G
@@ -638,7 +791,7 @@ function handleColorVerticeClick(e) {
         squareColor = square.getColor(i)
         for (let j = 0; j < squareVertices.length; j += 2) {
             colorIdxStart = j / 2 * 4
-            if (dist(x, y, squareVertices[j], squareVertices[j + 1]) <= distance) {
+            if (dist(x, y, squareVertices[j], squareVertices[j + 1]) <= dist_radius) {
                 squareColor[colorIdxStart] = color[0]
                 squareColor[colorIdxStart + 1] = color[1]
                 squareColor[colorIdxStart + 2] = color[2]
@@ -654,7 +807,7 @@ function handleColorVerticeClick(e) {
         rectangleColor = rectangle.getColor(i)
         for (let j = 0; j < rectangleVertices.length; j += 2) {
             colorIdxStart = j / 2 * 4
-            if (dist(x, y, rectangleVertices[j], rectangleVertices[j + 1]) <= distance) {
+            if (dist(x, y, rectangleVertices[j], rectangleVertices[j + 1]) <= dist_radius) {
                 rectangleColor[colorIdxStart] = color[0]
                 rectangleColor[colorIdxStart + 1] = color[1]
                 rectangleColor[colorIdxStart + 2] = color[2]
@@ -670,7 +823,7 @@ function handleColorVerticeClick(e) {
         polygonColor = polygon.getColor(i)
         for (let j = 0; j < polygonVertices.length; j += 2) {
             colorIdxStart = j / 2 * 4
-            if (dist(x, y, polygonVertices[j], polygonVertices[j + 1]) <= distance) {
+            if (dist(x, y, polygonVertices[j], polygonVertices[j + 1]) <= dist_radius) {
                 polygonColor[colorIdxStart] = color[0]
                 polygonColor[colorIdxStart + 1] = color[1]
                 polygonColor[colorIdxStart + 2] = color[2]
@@ -694,7 +847,7 @@ function handleConvex() {
     isConvex = !isConvex
 }
 
-// Point Selection
+//Point Selection
 function handleSelectPointClick(e) {
     const rect = canvas.getBoundingClientRect();
     let x = e.clientX - rect.left;
@@ -725,6 +878,7 @@ function handleSelectPointClick(e) {
         line_dragging = false
     }
 
+    handleSelectClick(e) 
     // // Find the closest vertice to the squares
     // for (let i = 0; i < square.getVerticesLength(); i++) {
     //     squareVertices = square.getVertice(i)
@@ -767,6 +921,8 @@ function handleSelectPointDrag(e) {
     } else if (!line_dragging) {
         line_dragging = true
     }
+
+    handleResize(e)
 }
 
 function handleSelectPoint() {
