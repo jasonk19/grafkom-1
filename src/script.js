@@ -20,6 +20,7 @@ const shape_selector = new ShapeSelector()
 let active_rotator = null
 let move_dragging = false
 let active_mover = null
+let select_point_dragging = false
 
 // Resizer variables
 let active_scaler = null
@@ -569,25 +570,25 @@ function handleSelectClick(e) {
             if (type_selected === "line") {
                 init_X = line.vertices[idx_vertices]
                 init_Y = line.vertices[idx_vertices + 1]
-                active_scaler = new Scaler(line.vertices[idx_vertices], line.vertices[idx_vertices+1], shape_selector, 0, idx_vertices)
+                active_scaler = new Scaler(line.vertices[idx_vertices], line.vertices[idx_vertices + 1], shape_selector, 0, idx_vertices)
             }
             else if (type_selected === "square") {
                 init_X = square.vertices[idx_vertices][idx_vertice]
-                init_Y = square.vertices[idx_vertices][idx_vertice+1]
-                active_scaler = new Scaler(square.vertices[idx_vertices][idx_vertice], square.vertices[idx_vertices][idx_vertice+1], shape_selector, 0, idx_vertice)
+                init_Y = square.vertices[idx_vertices][idx_vertice + 1]
+                active_scaler = new Scaler(square.vertices[idx_vertices][idx_vertice], square.vertices[idx_vertices][idx_vertice + 1], shape_selector, 0, idx_vertice)
             }
             else if (type_selected === "rectangle") {
                 init_X = rectangle.vertices[idx_vertices][idx_vertice]
-                init_Y = rectangle.vertices[idx_vertices][idx_vertice+1]
-                active_scaler = new Scaler(rectangle.vertices[idx_vertices][idx_vertice], rectangle.vertices[idx_vertices][idx_vertice+1], shape_selector, 0, idx_vertice)
+                init_Y = rectangle.vertices[idx_vertices][idx_vertice + 1]
+                active_scaler = new Scaler(rectangle.vertices[idx_vertices][idx_vertice], rectangle.vertices[idx_vertices][idx_vertice + 1], shape_selector, 0, idx_vertice)
             }
             else if (type_selected === "polygon") {
                 init_X = polygon.vertices[idx_vertices][idx_vertice]
-                init_Y = polygon.vertices[idx_vertices][idx_vertice+1]
-                active_scaler = new Scaler(polygon.vertices[idx_vertices][idx_vertice], polygon.vertices[idx_vertices][idx_vertice+1], shape_selector, 0, idx_vertice)
+                init_Y = polygon.vertices[idx_vertices][idx_vertice + 1]
+                active_scaler = new Scaler(polygon.vertices[idx_vertices][idx_vertice], polygon.vertices[idx_vertices][idx_vertice + 1], shape_selector, 0, idx_vertice)
             }
             console.log(init_X, init_Y)
-            
+
         }
     }
     else {
@@ -619,20 +620,20 @@ function handleResize(e) {
 
     x = x / canvas.width * 2 - 1
     y = 1 - y / canvas.height * 2
-    
+
     if (active_resizing) {
         if (type_selected === "line") {
             line.vertices[idx_vertices] = x
-            line.vertices[idx_vertices+1] = y
+            line.vertices[idx_vertices + 1] = y
             // active_scaler.scale(x,y)
         } else if (type_selected === "square") {
 
-            active_scaler.scale(x,y)
+            active_scaler.scale(x, y)
         } else if (type_selected === "rectangle") {
-            active_scaler.scale(x,y)
+            active_scaler.scale(x, y)
         } else if (type_selected === "polygon") {
             polygon.vertices[idx_vertices][idx_vertice] = x
-            polygon.vertices[idx_vertices][idx_vertice+1] = y
+            polygon.vertices[idx_vertices][idx_vertice + 1] = y
             // active_scaler.scale(x,y)
         }
     }
@@ -645,7 +646,7 @@ function doSelect() {
         handleSelectClick(e)
     }
 
-    canvas.onmousemove = function(e) {
+    canvas.onmousemove = function (e) {
         handleResize(e)
     }
     inputRotationDegree.onchange = function (e) {
@@ -861,11 +862,11 @@ function handleSelectPointClick(e) {
     // console.log(line_dragging)
     // console.log(line.selected_vertices_position)
 
-    if (line_dragging && line.selected_vertices_position.length === 0) {
-        line_dragging = false
+    if (select_point_dragging && line.selected_vertices_position.length === 0) {
+        select_point_dragging = false
     }
 
-    if (!line_dragging && line.selected_vertices_position.length === 0) {
+    if (!select_point_dragging && line.selected_vertices_position.length === 0) {
         // Find the closest vertice to the lines
         for (let i = 0; i < line.getVerticesLength(); i += 2) {
             if (dist(x, y, line.getVertice(i), line.getVertice(i + 1)) <= distance) {
@@ -875,10 +876,10 @@ function handleSelectPointClick(e) {
         }
     } else {
         line.clearSelectedVertices()
-        line_dragging = false
+        select_point_dragging = false
     }
 
-    handleSelectClick(e) 
+    handleSelectClick(e)
     // // Find the closest vertice to the squares
     // for (let i = 0; i < square.getVerticesLength(); i++) {
     //     squareVertices = square.getVertice(i)
@@ -915,11 +916,11 @@ function handleSelectPointDrag(e) {
     x = x / canvas.width * 2 - 1
     y = 1 - y / canvas.height * 2
 
-    if (line_dragging && line.selected_vertices_position) {
+    if (select_point_dragging && line.selected_vertices_position) {
         line.setVertice(line.selected_vertices_position[0], x)
         line.setVertice(line.selected_vertices_position[1], y)
-    } else if (!line_dragging) {
-        line_dragging = true
+    } else if (!select_point_dragging) {
+        select_point_dragging = true
     }
 
     handleResize(e)
