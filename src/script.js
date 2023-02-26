@@ -364,7 +364,7 @@ function handleChangeRotation(e) {
     const value = e.target.value
     console.log("CALLED ROTATION")
     if (active_rotator === null) {
-        active_rotator = new Rotator(shape_selector.owner.collector,shape_selector.owner.index)
+        active_rotator = new Rotator(shape_selector.owner.collector, shape_selector.owner.index)
     }
 
     if (value === "") {
@@ -481,7 +481,7 @@ function handleChangeScaleFactor(e) {
     if (active_scaler === null) {
         active_scaler = new Scaler(null, null, shape_selector, 0, 0)
     }
-    
+
     if (value !== "") {
         active_scaler.scaleByFactor(value)
     }
@@ -694,6 +694,87 @@ function handleConvex() {
     isConvex = !isConvex
 }
 
+// Point Selection
+function handleSelectPointClick(e) {
+    const rect = canvas.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    x = x / canvas.width * 2 - 1
+    y = 1 - y / canvas.height * 2
+
+    let distance = 0.05
+
+    // console.log(line_dragging)
+    // console.log(line.selected_vertices_position)
+
+    if (line_dragging && line.selected_vertices_position.length === 0) {
+        line_dragging = false
+    }
+
+    if (!line_dragging && line.selected_vertices_position.length === 0) {
+        // Find the closest vertice to the lines
+        for (let i = 0; i < line.getVerticesLength(); i += 2) {
+            if (dist(x, y, line.getVertice(i), line.getVertice(i + 1)) <= distance) {
+                line.setSelectedVertices(line.getVertice(i), line.getVertice(i + 1))
+                line.setSelectedVerticesPosition()
+            }
+        }
+    } else {
+        line.clearSelectedVertices()
+        line_dragging = false
+    }
+
+    // // Find the closest vertice to the squares
+    // for (let i = 0; i < square.getVerticesLength(); i++) {
+    //     squareVertices = square.getVertice(i)
+    //     for (let j = 0; j < squareVertices.length; j += 2) {
+
+    //     }
+    // }
+
+    // // Find the closest vertice to the rectangles
+    // for (let i = 0; i < rectangle.getVerticesLength(); i++) {
+    //     rectangleVertices = rectangle.getVertice(i)
+    //     for (let j = 0; j < rectangleVertices.length; j += 2) {
+
+    //     }
+    // }
+
+    // // Find the closest vertice to the polygons
+    // for (let i = 0; i < polygon.getVerticesLength(); i++) {
+    //     polygonVertices = polygon.getVertice(i)
+    //     for (let j = 0; j < polygonVertices.length; j += 2) {
+    //         colorIdxStart = j / 2 * 4
+    //         if (dist(x, y, polygonVertices[j], polygonVertices[j + 1]) <= distance) {
+
+    //         }
+    //     }
+    // }
+}
+
+function handleSelectPointDrag(e) {
+    const rect = canvas.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    x = x / canvas.width * 2 - 1
+    y = 1 - y / canvas.height * 2
+
+    if (line_dragging && line.selected_vertices_position) {
+        line.setVertice(line.selected_vertices_position[0], x)
+        line.setVertice(line.selected_vertices_position[1], y)
+    } else if (!line_dragging) {
+        line_dragging = true
+    }
+}
+
+function handleSelectPoint() {
+    modeText.innerText = "Select Point tool"
+    canvas.onmousedown = function (e) { handleSelectPointClick(e) }
+    canvas.onmousemove = function (e) { handleSelectPointDrag(e) }
+}
+
 btnLine.addEventListener("click", drawLine)
 btnSquare.addEventListener("click", drawSquare)
 btnRectangle.addEventListener("click", drawRectangle)
@@ -706,4 +787,5 @@ colorVertice.addEventListener("click", colorOneVertice)
 btnSelect.addEventListener("click", doSelect)
 btnMove.addEventListener("click", doMove)
 checkConvex.addEventListener("change", handleConvex)
+btnSelectPoint.addEventListener("click", handleSelectPoint)
 window.onload = main
