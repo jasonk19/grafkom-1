@@ -32,10 +32,12 @@
                     <p>Selection Tool</p>
                     <button id="btnSelect">Select</button>
                 </div>
-                <div class = "color-container">
-                    <p>Color</p>
-                    <input type="color" id="btnColor" value="#000000">
-                    <button id="colorVertice">Color Vertice</button>
+                <div class="color-container">
+                    <p>Color Tool</p>
+                    <div class="color-handler">
+                        <input type="color" id="btnColor" value="#000000">
+                        <button id="colorVertice">Color Vertice</button>
+                    </div>
                 </div>
                 <div class="save-container">
                     <p>Save Graphics</p>
@@ -56,6 +58,7 @@
 
     <!-- SCRIPTS -->
     <script src="./dom.js"></script>
+    <script src="./convexHull.js"></script>
     <script src="./glUtils.js"></script>
     <script src="./shape.js"></script>
     <script src="./line.js"></script>
