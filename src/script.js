@@ -88,6 +88,7 @@ function main() {
         for (let i = 0; i < polygon.getVerticesLength(); i++) {
             let vert = polygon.getVertice(i)
             let color = polygon.getColor(i)
+            vert = convexHull(vert)
             setBuffer(vert, color)
             count = Math.floor(vert.length / 2)
             gl.drawArrays(gl.TRIANGLE_FAN, 0, count)
@@ -377,9 +378,9 @@ function hexToRGB(hex) {
 function changeColor() {
     var hexColor = btnColor.value;
     RGBColor = hexToRGB(hexColor);
-    color[0] = RGBColor[0]/255 //R
-    color[1] = RGBColor[1]/255 //G
-    color[2] = RGBColor[2]/255 //B
+    color[0] = RGBColor[0] / 255 //R
+    color[1] = RGBColor[1] / 255 //G
+    color[2] = RGBColor[2] / 255 //B
     color[3] = 1.0             //A
 }
 
@@ -399,60 +400,60 @@ function handleColorVerticeClick(e) {
     let distance = 0.1
 
     // Find the closest vertice to the lines
-    for (let i = 0 ; i < line.getVerticesLength() ; i+=2) {
+    for (let i = 0; i < line.getVerticesLength(); i += 2) {
         let lineIdx = i / 2
-        if (dist(x, y, line.getVertice(i), line.getVertice(i+1)) <= distance) {
+        if (dist(x, y, line.getVertice(i), line.getVertice(i + 1)) <= distance) {
             colorIdxStart = lineIdx * 4
             line.setColor(colorIdxStart, color[0])      //R
-            line.setColor(colorIdxStart+1, color[1])    //G
-            line.setColor(colorIdxStart+2, color[2])    //B
-            line.setColor(colorIdxStart+3, color[3])    //A
+            line.setColor(colorIdxStart + 1, color[1])    //G
+            line.setColor(colorIdxStart + 2, color[2])    //B
+            line.setColor(colorIdxStart + 3, color[3])    //A
         }
     }
 
     // Find the closest vertice to the squares
-    for (let i = 0 ; i < square.getVerticesLength() ; i++) {
+    for (let i = 0; i < square.getVerticesLength(); i++) {
         squareVertices = square.getVertice(i)
         squareColor = square.getColor(i)
-        for (let j = 0 ; j < squareVertices.length ; j+=2) {
-            colorIdxStart = j/2 * 4
-            if (dist(x, y, squareVertices[j], squareVertices[j+1]) <= distance) {
+        for (let j = 0; j < squareVertices.length; j += 2) {
+            colorIdxStart = j / 2 * 4
+            if (dist(x, y, squareVertices[j], squareVertices[j + 1]) <= distance) {
                 squareColor[colorIdxStart] = color[0]
-                squareColor[colorIdxStart+1] = color[1]
-                squareColor[colorIdxStart+2] = color[2]
-                squareColor[colorIdxStart+3] = color[3]
+                squareColor[colorIdxStart + 1] = color[1]
+                squareColor[colorIdxStart + 2] = color[2]
+                squareColor[colorIdxStart + 3] = color[3]
                 square.setColor(i, squareColor)
             }
         }
     }
 
     // Find the closest vertice to the rectangles
-    for (let i = 0 ; i < rectangle.getVerticesLength() ; i++) {
+    for (let i = 0; i < rectangle.getVerticesLength(); i++) {
         rectangleVertices = rectangle.getVertice(i)
         rectangleColor = rectangle.getColor(i)
-        for (let j = 0 ; j < rectangleVertices.length ; j+=2) {
-            colorIdxStart = j/2 * 4
-            if (dist(x, y, rectangleVertices[j], rectangleVertices[j+1]) <= distance) {
+        for (let j = 0; j < rectangleVertices.length; j += 2) {
+            colorIdxStart = j / 2 * 4
+            if (dist(x, y, rectangleVertices[j], rectangleVertices[j + 1]) <= distance) {
                 rectangleColor[colorIdxStart] = color[0]
-                rectangleColor[colorIdxStart+1] = color[1]
-                rectangleColor[colorIdxStart+2] = color[2]
-                rectangleColor[colorIdxStart+3] = color[3]
+                rectangleColor[colorIdxStart + 1] = color[1]
+                rectangleColor[colorIdxStart + 2] = color[2]
+                rectangleColor[colorIdxStart + 3] = color[3]
                 rectangle.setColor(i, rectangleColor)
             }
         }
     }
 
     // Find the closest vertice to the polygons
-    for (let i = 0 ; i < polygon.getVerticesLength() ; i++) {
+    for (let i = 0; i < polygon.getVerticesLength(); i++) {
         polygonVertices = polygon.getVertice(i)
         polygonColor = polygon.getColor(i)
-        for (let j = 0 ; j < polygonVertices.length ; j+=2) {
-            colorIdxStart = j/2 * 4
-            if (dist(x, y, polygonVertices[j], polygonVertices[j+1]) <= distance) {
+        for (let j = 0; j < polygonVertices.length; j += 2) {
+            colorIdxStart = j / 2 * 4
+            if (dist(x, y, polygonVertices[j], polygonVertices[j + 1]) <= distance) {
                 polygonColor[colorIdxStart] = color[0]
-                polygonColor[colorIdxStart+1] = color[1]
-                polygonColor[colorIdxStart+2] = color[2]
-                polygonColor[colorIdxStart+3] = color[3]
+                polygonColor[colorIdxStart + 1] = color[1]
+                polygonColor[colorIdxStart + 2] = color[2]
+                polygonColor[colorIdxStart + 3] = color[3]
                 polygon.setColor(i, polygonColor)
             }
         }
