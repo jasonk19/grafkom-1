@@ -50,7 +50,8 @@ main {
 .save-container,
 .help-container,
 .load-container,
-.color-container {
+.color-container,
+.convex-container {
     width: 100%;
     display: flex;
     justify-content: space-between;

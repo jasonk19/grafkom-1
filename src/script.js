@@ -13,6 +13,7 @@ let line_dragging = false
 let square_dragging = false
 let rectangle_dragging = false
 let polygon_dragging = false
+let isConvex = false
 
 // TRANSFORMATION UTILS
 const shape_selector = new ShapeSelector()
@@ -99,7 +100,6 @@ function main() {
         for (let i = 0; i < polygon.getVerticesLength(); i++) {
             let vert = polygon.getVertice(i)
             let color = polygon.getColor(i)
-            vert = convexHull(vert)
             setBuffer(vert, color)
             count = Math.floor(vert.length / 2)
             gl.drawArrays(gl.TRIANGLE_FAN, 0, count)
@@ -401,8 +401,19 @@ function stopPolygonDraw() {
     polygon.removeTempPolygonVertice()
     polygon.removeTempPolygonColors()
 
-    polygon.addVertice(polygon.temp_polygon_vertices)
-    polygon.addColor(polygon.temp_polygon_colors)
+    if (isConvex) {
+        const convexHullPolygon = convexHull(polygon.temp_polygon_vertices)
+        const convexHullPolygonColors = []
+        for (let i = 0; i < Math.floor(convexHullPolygon.length / 2); i++) {
+            convexHullPolygonColors.push(color[0], color[1], color[2], color[3])
+        }
+
+        polygon.addVertice(convexHullPolygon)
+        polygon.addColor(convexHullPolygonColors)
+    } else {
+        polygon.addVertice(polygon.temp_polygon_vertices)
+        polygon.addColor(polygon.temp_polygon_colors)
+    }
 
     polygon.clearTempPolygonVertices()
     polygon.clearTempPolygonColors()
@@ -657,6 +668,9 @@ function colorOneVertice() {
     }
 }
 
+function handleConvex() {
+    isConvex = !isConvex
+}
 
 btnLine.addEventListener("click", drawLine)
 btnSquare.addEventListener("click", drawSquare)
@@ -669,4 +683,5 @@ btnColor.addEventListener("change", changeColor)
 colorVertice.addEventListener("click", colorOneVertice)
 btnSelect.addEventListener("click", doSelect)
 btnMove.addEventListener("click", doMove)
+checkConvex.addEventListener("change", handleConvex)
 window.onload = main
