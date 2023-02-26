@@ -32,9 +32,15 @@
                     <p>Selection Tool</p>
                     <button id="btnSelect">Select</button>
                 </div>
-                <div class="selection-container">
-                    <p>Move Tool</p>
-                    <button id="btnMove">Select</button>
+                <div id="transformation-tool">
+                    <div class="selection-container">
+                        <p>Move Tool</p>
+                        <button id="btnMove">Select</button>
+                    </div>
+                    <div class="selection-container">
+                        <p>Rotation Degree</p>
+                        <input type="number" id="inputRotationDegree"></input>
+                    </div>
                 </div>
                 <div class="color-container">
                     <p>Color Tool</p>
@@ -70,6 +76,8 @@
     <script src="./rectangle.js"></script>
     <script src="./polygon.js"></script>
     <script src="./mover.js"></script>
+    <script src="./shape_selector.js"></script>
+    <script src="./rotator.js"></script>
     <script src="./script.js"></script>
 
 </body>

@@ -15,6 +15,8 @@ let rectangle_dragging = false
 let polygon_dragging = false
 
 // TRANSFORMATION UTILS
+const shape_selector = new ShapeSelector()
+let active_rotator = null
 let move_dragging = false
 let active_mover = null
 
@@ -108,15 +110,24 @@ function main() {
         count = Math.floor(polygon.getTempPolygonVerticesLength() / 2);
         gl.drawArrays(gl.TRIANGLE_FAN, 0, count);
         window.requestAnimationFrame(draw)
-        //
-        // // SELECT
-        // for (let i = 0; i < select.getVerticesLength(); i++) {
-        //     let vert = select.getVertice(i)
-        //     let color = select.getColor(i)
-        //     setBuffer(vert, color)
-        //     count = Math.floor(vert.length / 2)
-        //     gl.drawArrays(gl.TRIANGLE_FAN, 0, count)
-        // }
+
+        // SELECT
+        for (let i = 0; i < shape_selector.getVerticesLength(); i++) {
+            let vert = shape_selector.getVertice(i)
+            let color = shape_selector.getColor(i)
+            setBuffer(vert, color)
+            count = Math.floor(vert.length / 2)
+            gl.drawArrays(gl.TRIANGLE_FAN, 0, count)
+        }
+    }
+
+    function drawSliderPoints(shapeVertexes, color) {
+        let c = color.map((c, i) => {
+            return c + 0.3 % 1
+        })
+        console.log("DRAWING DOTS")
+        setBuffer(shapeVertexes, c)
+        gl.drawArrays(gl.POINTS, 0, Math.floor(shapeVertexes.length / 2))
     }
 }
 
@@ -348,6 +359,24 @@ function handlePolygonClick(e) {
     }
 }
 
+function handleChangeDilation(e) {
+    const value = e.target.value
+}
+
+function handleChangeRotation(e) {
+    const value = e.target.value
+    console.log("CALLED ROTATION")
+    if (active_rotator === null) {
+        active_rotator = new Rotator(shape_selector.owner.collector,shape_selector.owner.index)
+    }
+
+    if (value === "") {
+        active_rotator.rotateBackToDefault()
+    } else {
+        active_rotator.rotate(value)
+    }
+}
+
 function handlePolygonDrag(e) {
     const rect = canvas.getBoundingClientRect();
     let x = e.clientX - rect.left;
@@ -367,6 +396,7 @@ function handlePolygonDrag(e) {
 }
 
 function stopPolygonDraw() {
+    polygon_dragging = false
     polygon_dragging = false
     polygon.removeTempPolygonVertice()
     polygon.removeTempPolygonColors()
@@ -408,16 +438,43 @@ function drawRectangle() {
     }
 }
 
+function handleSelectClick(e) {
+    const rect = canvas.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    x = x / canvas.width * 2 - 1
+    y = 1 - y / canvas.height * 2
+
+    shape_selector.setVertices([])
+    shape_selector.setColors([])
+
+    active_rotator = null
+
+    const owner = getVertexOwner(x, y)
+    shape_selector.owner = owner
+    if (owner != null) {
+        console.log("OWNER FOUND")
+        shape_selector.addVertice(owner.vertices)
+
+        let selected_color = owner.color.map((x, i) => {
+            if (i % 4 === 3) {
+                return 0.5
+            }
+            return x
+        })
+        shape_selector.addColor(selected_color)
+    }
+}
+
 function doSelect() {
     modeText.innerText = "Select tool";
+    transformationTool.style.display = "flex"
     canvas.onmousedown = function (e) {
         handleSelectClick(e)
     }
-    canvas.onmousemove = function (e) {
-        handleSelectDrag(e)
-    }
-    canvas.onmouseup = function (e) {
-        canvas.onmousemove = null
+    inputRotationDegree.onchange = function (e) {
+        handleChangeRotation(e)
     }
 }
 
@@ -444,6 +501,7 @@ function drawPolygon() {
         handlePolygonDrag(e)
     }
 }
+
 
 function saveGraphic() {
     let element = document.createElement("a")
@@ -598,6 +656,7 @@ function colorOneVertice() {
         handleColorVerticeClick(e)
     }
 }
+
 
 btnLine.addEventListener("click", drawLine)
 btnSquare.addEventListener("click", drawSquare)

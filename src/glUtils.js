@@ -5,6 +5,7 @@ varying vec4 f_color;
 void main() {
     gl_Position = a_position;
     f_color = a_color;
+    gl_PointSize = 10.0;
 }`;
 
 const fragmentShaderSource = `

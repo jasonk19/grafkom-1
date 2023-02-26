@@ -1,6 +1,6 @@
-class Rectangle extends Shape {
+class Slider extends Shape {
     constructor() {
-        super("rectangle")
+        super("slider")
         this.temp_rectangle_vertices = []
         this.temp_rectangle_colors = []
     }

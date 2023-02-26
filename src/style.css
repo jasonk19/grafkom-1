@@ -80,3 +80,13 @@ button:focus {
     border-radius: 10px;
     border: 20px blue;
 }
+
+#transformation-tool{
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    padding: 15px;
+    border: 2px solid black;
+    border-radius: 10px;
+}

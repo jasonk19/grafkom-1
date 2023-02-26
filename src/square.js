@@ -1,6 +1,6 @@
 class Square extends Shape {
     constructor() {
-        super()
+        super("square")
         this.temp_square_vertices = []
         this.temp_square_colors = []
     }

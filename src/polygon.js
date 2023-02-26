@@ -1,6 +1,6 @@
 class Polygon extends Shape {
     constructor() {
-        super()
+        super("polygon")
         this.temp_polygon_vertices = []
         this.temp_polygon_colors = []
     }

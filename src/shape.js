@@ -1,8 +1,11 @@
 class Shape {
     constructor() {
+        this.type = "base_shape"
         this.vertices = []
         this.colors = []
     }
+
+
 
     getVertices() {
         return this.vertices
