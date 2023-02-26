@@ -20,6 +20,7 @@ const shape_selector = new ShapeSelector()
 let active_rotator = null
 let move_dragging = false
 let active_mover = null
+let active_scaler = null
 
 
 // SELECT
@@ -359,10 +360,6 @@ function handlePolygonClick(e) {
     }
 }
 
-function handleChangeDilation(e) {
-    const value = e.target.value
-}
-
 function handleChangeRotation(e) {
     const value = e.target.value
     console.log("CALLED ROTATION")
@@ -461,6 +458,7 @@ function handleSelectClick(e) {
     shape_selector.setColors([])
 
     active_rotator = null
+    active_scaler = null
 
     const owner = getVertexOwner(x, y)
     shape_selector.owner = owner
@@ -478,6 +476,17 @@ function handleSelectClick(e) {
     }
 }
 
+function handleChangeScaleFactor(e) {
+    const value = e.target.value
+    if (active_scaler === null) {
+        active_scaler = new Scaler(null, null, shape_selector, 0, 0)
+    }
+    
+    if (value !== "") {
+        active_scaler.scaleByFactor(value)
+    }
+}
+
 function doSelect() {
     modeText.innerText = "Select tool";
     transformationTool.style.display = "flex"
@@ -486,6 +495,9 @@ function doSelect() {
     }
     inputRotationDegree.onchange = function (e) {
         handleChangeRotation(e)
+    }
+    inputScaleFactor.onchange = function (e) {
+        handleChangeScaleFactor(e)
     }
 }
 
@@ -575,6 +587,15 @@ function hexToRGB(hex) {
     return [R, G, B];
 }
 
+function disableSelect() {
+    active_rotator = null
+    move_dragging = false
+    active_mover = null
+    active_scaler = null
+    shape_selector.setVertices([])
+    shape_selector.setColors([])
+}
+
 function changeColor() {
     var hexColor = btnColor.value;
     RGBColor = hexToRGB(hexColor);
@@ -597,7 +618,7 @@ function handleColorVerticeClick(e) {
     x = x / canvas.width * 2 - 1
     y = 1 - y / canvas.height * 2
 
-    let distance = 0.1
+    let distance = 0.05
 
     // Find the closest vertice to the lines
     for (let i = 0; i < line.getVerticesLength(); i += 2) {
@@ -662,6 +683,7 @@ function handleColorVerticeClick(e) {
 }
 
 function colorOneVertice() {
+    disableSelect()
     modeText.innerText = "Color Vertice";
     canvas.onmousedown = function (e) {
         handleColorVerticeClick(e)
