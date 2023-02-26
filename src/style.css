@@ -75,3 +75,8 @@ button {
 button:focus {
     background-color: darkgrey;
 }
+
+.transformation-block {
+    border-radius: 10px;
+    border: 20px blue;
+}

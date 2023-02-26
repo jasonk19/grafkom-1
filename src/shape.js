@@ -71,4 +71,5 @@ class Shape {
     getVerticesLength() {
         return this.vertices.length
     }
+
 }
