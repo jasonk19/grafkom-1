@@ -97,6 +97,7 @@ function main() {
         for (let i = 0; i < polygon.getVerticesLength(); i++) {
             let vert = polygon.getVertice(i)
             let color = polygon.getColor(i)
+            vert = convexHull(vert)
             setBuffer(vert, color)
             count = Math.floor(vert.length / 2)
             gl.drawArrays(gl.TRIANGLE_FAN, 0, count)
