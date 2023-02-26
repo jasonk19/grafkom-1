@@ -7,11 +7,20 @@ const polygon = new Polygon()
 
 // UTILS
 const color = [0, 0, 0, 1]
+const selectionColor = [0, 0, 1, 1]
 let count = -1
 let line_dragging = false
 let square_dragging = false
 let rectangle_dragging = false
 let polygon_dragging = false
+
+// TRANSFORMATION UTILS
+let move_dragging = false
+let active_mover = null
+
+
+// SELECT
+let current_select = null
 
 // MAIN PROGRAM
 function main() {
@@ -97,8 +106,16 @@ function main() {
         setBuffer(polygon.getTempPolygonVertices(), polygon.getTempPolygonColors());
         count = Math.floor(polygon.getTempPolygonVerticesLength() / 2);
         gl.drawArrays(gl.TRIANGLE_FAN, 0, count);
-
         window.requestAnimationFrame(draw)
+        //
+        // // SELECT
+        // for (let i = 0; i < select.getVerticesLength(); i++) {
+        //     let vert = select.getVertice(i)
+        //     let color = select.getColor(i)
+        //     setBuffer(vert, color)
+        //     count = Math.floor(vert.length / 2)
+        //     gl.drawArrays(gl.TRIANGLE_FAN, 0, count)
+        // }
     }
 }
 
@@ -191,6 +208,45 @@ function handleSquareDrag(e) {
     }
 }
 
+function handleMoveClick(e) {
+    const rect = canvas.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    x = x / canvas.width * 2 - 1
+    y = 1 - y / canvas.height * 2
+    let shape = getVertexOwner(x, y)
+    current_select = shape
+
+
+    if (shape != null) {
+        move_dragging = true
+        active_mover = new Mover(x, y, shape.collector, shape.index)
+        return
+    }
+}
+
+function handleMoveDrag(e) {
+    const rect = canvas.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    x = x / canvas.width * 2 - 1
+    y = 1 - y / canvas.height * 2
+
+    if (active_mover == null) {
+        return
+    }
+
+    active_mover.move(x, y)
+}
+
+function handleMoveRelease(e) {
+    if (active_mover != null) {
+        active_mover = null
+    }
+}
+
 // Rectangle
 function handleRectangleClick(e) {
     const rect = canvas.getBoundingClientRect();
@@ -240,6 +296,38 @@ function handleRectangleDrag(e) {
         rectangle.setTempRectangleVertice(rectangle.getTempRectangleVerticesLength() - 2, x)
         rectangle.setTempRectangleVertice(rectangle.getTempRectangleVerticesLength() - 1, y0)
     }
+}
+
+function getVertexOwner(x, y) {
+    const squares = square.getVertices()
+    const rectangles = rectangle.getVertices()
+    const polygons = polygon.getVertices()
+    const lines = line.getVertices()
+    for (let i = 0; i < squares.length; i += 1) {
+        if (x >= squares[i][0] && x <= squares[i][4] && y <= squares[i][1] && y >= squares[i][3]) {
+            return {
+                "type": "square",
+                "vertices": squares[i],
+                "color": square.getColor(i),
+                "collector": square,
+                "index": i,
+            }
+        }
+    }
+
+    for (let i = 0; i < rectangles.length; i += 1) {
+        if (x >= rectangles[i][0] && x <= rectangles[i][4] && y <= rectangles[i][1] && y >= rectangles[i][3]) {
+            return {
+                "type": "rectangle",
+                "vertices": rectangles[i],
+                "color": rectangle.getColor(i),
+                "collector": rectangle,
+                "index": i,
+            }
+        }
+    }
+
+    return null
 }
 
 // Polygon
@@ -297,26 +385,69 @@ function stopPolygonDraw() {
 
 function drawLine() {
     modeText.innerText = "Line tool";
-    canvas.onmousedown = function (e) { handleLineClick(e) };
-    canvas.onmousemove = function (e) { handleLineDrag(e) };
+    canvas.onmousedown = function (e) {
+        handleLineClick(e)
+    };
+    canvas.onmousemove = function (e) {
+        handleLineDrag(e)
+    };
 }
 
 function drawSquare() {
     modeText.innerText = "Square tool";
-    canvas.onmousedown = function (e) { handleSquareClick(e) }
-    canvas.onmousemove = function (e) { handleSquareDrag(e) }
+    canvas.onmousedown = function (e) {
+        handleSquareClick(e)
+    }
+    canvas.onmousemove = function (e) {
+        handleSquareDrag(e)
+    }
 }
 
 function drawRectangle() {
     modeText.innerText = "Rectangle tool";
-    canvas.onmousedown = function (e) { handleRectangleClick(e) }
-    canvas.onmousemove = function (e) { handleRectangleDrag(e) }
+    canvas.onmousedown = function (e) {
+        handleRectangleClick(e)
+    }
+    canvas.onmousemove = function (e) {
+        handleRectangleDrag(e)
+    }
+}
+
+function doSelect() {
+    modeText.innerText = "Select tool";
+    canvas.onmousedown = function (e) {
+        handleSelectClick(e)
+    }
+    canvas.onmousemove = function (e) {
+        handleSelectDrag(e)
+    }
+    canvas.onmouseup = function (e) {
+        canvas.onmousemove = null
+    }
+}
+
+
+function doMove() {
+    modeText.innerText = "Move tool";
+    canvas.onmousedown = function (e) {
+        handleMoveClick(e)
+    }
+    canvas.onmousemove = function (e) {
+        handleMoveDrag(e)
+    }
+    canvas.onmouseup = function (e) {
+        handleMoveRelease(e)
+    }
 }
 
 function drawPolygon() {
     modeText.innerText = "Polygon tool";
-    canvas.onmousedown = function (e) { handlePolygonClick(e) }
-    canvas.onmousemove = function (e) { handlePolygonDrag(e) }
+    canvas.onmousedown = function (e) {
+        handlePolygonClick(e)
+    }
+    canvas.onmousemove = function (e) {
+        handlePolygonDrag(e)
+    }
 }
 
 function saveGraphic() {
@@ -468,7 +599,9 @@ function handleColorVerticeClick(e) {
 
 function colorOneVertice() {
     modeText.innerText = "Color Vertice";
-    canvas.onmousedown = function (e) { handleColorVerticeClick(e) }
+    canvas.onmousedown = function (e) {
+        handleColorVerticeClick(e)
+    }
 }
 
 btnLine.addEventListener("click", drawLine)
@@ -480,5 +613,6 @@ btnSave.addEventListener("click", saveGraphic)
 fileInput.addEventListener("change", loadGraphic)
 btnColor.addEventListener("change", changeColor)
 colorVertice.addEventListener("click", colorOneVertice)
-
+btnSelect.addEventListener("click", doSelect)
+btnMove.addEventListener("click", doMove)
 window.onload = main
